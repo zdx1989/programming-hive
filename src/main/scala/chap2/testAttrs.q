@@ -6,8 +6,8 @@
  set foo;
  set hivevar:foo;
 
- ## hivevar 命名空间 可读可写 用户自定义变量
- ## hivevar: 是可选的，--hivevar和--define标记是相同的
+ -- hivevar 命名空间 可读可写 用户自定义变量
+ -- hivevar: 是可选的，--hivevar和--define标记是相同的
 
  create table toss1(i int, ${hivevar:foo} string);
  describe table toss1;
@@ -17,4 +17,6 @@
 
  drop table toss1;
  drop table toss2;
+
+ -- CLI中的变量会首先替换掉， 然后再提交给查询处理器
 
