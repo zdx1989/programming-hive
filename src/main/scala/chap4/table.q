@@ -28,3 +28,27 @@ SHOW TABLES  'empl.*';
 DESCRIBE FORMATTED mydb.employees;
 
 --  可以输出表的详细信息
+
+-- 内部表，管理表，存储的路径为/user/hive/warehouse/xx.db/xxx，有hive控制器数据的生命周期，删除表的同时，会删除表中的数据
+-- 外部表，hive和其他的工具例如pig共享的数据源，可以为表指定LOCATION，删除外部表，只是删除了表的元数据，表中的数据不会被删除
+
+DROP TABLE IF EXISTS stocks;
+CREATE EXTERNAL TABLE IF NOT EXISTS stocks (
+    `exchange`  STRING,
+    symbol     STRING,
+    ymd        STRING,
+    price_open FLOAT,
+    price_high FLOAT,
+    price_low  FLOAT,
+    price_close FLOAT,
+    volume      INT,
+    price_adj_close FLOAT
+)
+ROW FORMAT DELIMITED FIELDS TERMINATED BY ','
+LOCATION '/data/stocks';
+
+CREATE TABLE IF NOT EXISTS mydb.employees3
+LIKE mydb.employees
+LOCATION '/path/to/data'
+
+--复制外部表的模式，但是不会复制表的数据
