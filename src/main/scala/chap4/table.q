@@ -52,3 +52,15 @@ LIKE mydb.employees
 LOCATION '/path/to/data'
 
 --复制外部表的模式，但是不会复制表的数据
+
+DROP TABLE IF EXISTS employees;
+CREATE TABLE IF NOT EXISTS employees (
+    name         STRING,
+    salary       FLOAT,
+    subordinates ARRAY<STRING>,
+    deductions   MAP<STRING, FLOAT>,
+    address      STRUCT<street: STRING, city: STRING, state: STRING, zip: INT>
+)
+PARTITIONED BY (country STRING, state STRING);
+
+-- 表分区可以缩小查询时数据集的范围，表分区改变数据的存储目录，对应的分区数据存储到对应的分区目录下
