@@ -61,6 +61,35 @@ CREATE TABLE IF NOT EXISTS employees (
     deductions   MAP<STRING, FLOAT>,
     address      STRUCT<street: STRING, city: STRING, state: STRING, zip: INT>
 )
-PARTITIONED BY (country STRING, state STRING);
+PARTITIONED BY (country STRING, state STRING)
+ROW FORMAT DELIMITED FIELDS TERMINATED BY ',';
 
 -- 表分区可以缩小查询时数据集的范围，表分区改变数据的存储目录，对应的分区数据存储到对应的分区目录下
+
+-- 分区字段创建好之后，在一般的情况下和普通字段并没有什么区别
+
+SELECT * FROM employees
+WHERE country = 'US' AND state = 'IL';
+
+-- 分区字段的数据不会保存在表目录下对应的文件中, 分区目录可以表述分区字段
+
+-- 分区可以缩小查询的数据集，对于大数据查询可以大大的提高性能
+
+-- 将hive设置成严格模式，对于分区表查询假如在where过滤中中没有添加分区过滤的话，将会禁止提交查询任务
+
+set hive.mapred.mode=strict;
+SELECT e.name, e.salary FROM employees e LIMIT 100;
+
+set hive.mapred.mode=nostrict;
+SELECT e.name, e.salary FROM employees e LIMIT 100;
+
+SHOW PARTITIONS employees;
+
+-- 查看表中的所有分区
+
+SHOW PARTITIONS employees PARTITION(country='CA');
+
+--查看表中某个分区字段下所有的分区
+
+-- 可以通过载入数据方式创建分区
+
