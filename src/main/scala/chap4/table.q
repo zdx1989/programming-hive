@@ -89,7 +89,27 @@ SHOW PARTITIONS employees;
 
 SHOW PARTITIONS employees PARTITION(country='CA');
 
---查看表中某个分区字段下所有的分区
+-- 查看表中某个分区字段下所有的分区
 
 -- 可以通过载入数据方式创建分区
+
+LOAD DATA LOCAL INPATH '/Users/zhoudunxiong/Code/programming-hive/src/main/scala/chap4/data.txt'
+INTO TABLE employees
+PARTITION(country = 'CN', state = 'HN');
+
+-- 分区和分区目录的关系，直接在表目录下添加分区目录，并没有在hive的元数据中添加分区信息，所以show partitions找不到表对应的分区
+-- 通过alter table add partition 可以在hive的元数据中添加表的分区信息，同时会在表的目录下添加分区目录
+
+-- 为外部表添加分区
+
+CREATE EXTERNAL TABLE IF NOT EXISTS log_messages (
+    hms INT,
+    severity STRING,
+    server STRING,
+    process_id INT,
+    message STRING
+)
+PARTITIONED BY (year INT, month INT, day INT)
+ROW FORMAT DELIMITED FIELDS TERMINATED BY '\t';
+
 
