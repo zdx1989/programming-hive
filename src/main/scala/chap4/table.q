@@ -112,4 +112,18 @@ CREATE EXTERNAL TABLE IF NOT EXISTS log_messages (
 PARTITIONED BY (year INT, month INT, day INT)
 ROW FORMAT DELIMITED FIELDS TERMINATED BY '\t';
 
+-- 分区外部表可以在创建的时候不制定LOCATION ？
+
+ALTER TABLE log_messages ADD PARTITION (year = 2018, month = 12, day = 25)
+LOCATION '/user/zhoudunxiong/log_messages';
+
+-- 同一张分区外部表，不同的分区可以指向不同的LOCATION
+-- hive不关心分区目录是否存在或者分区目录下是否存在文件r
+
+DESCRIBE EXTENDED log_messages PARTITION(year = 2018, month = 12, day = 25);
+DESCRIBE FORMATTED log_messages PARTITION(year = 2018, month = 12, day = 25);
+
+-- DESCRIBE EXTENDED log_messages，DESCRIBE FORMATTED log_messages都不会显现外部分区表具体的LOCATION
+-- 外部分区表不同的分区可以有不同的LOCATION，所以可以在后面添加具体的partition来显示具体partition的LOCATION
+
 
