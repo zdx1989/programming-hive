@@ -126,4 +126,35 @@ DESCRIBE FORMATTED log_messages PARTITION(year = 2018, month = 12, day = 25);
 -- DESCRIBE EXTENDED log_messages，DESCRIBE FORMATTED log_messages都不会显现外部分区表具体的LOCATION
 -- 外部分区表不同的分区可以有不同的LOCATION，所以可以在后面添加具体的partition来显示具体partition的LOCATION
 
+-- 输入流 -> inputFormat -> 记录 -> SerDe -> 列 -> SerDe -> 记录 -> outputFormat -> 输出流
+
+-- 用户可以自己定义第三方SerDe，也可以自己定义第三方InputFormat和OutputFormat
+
+-- 删除表
+
+DROP TABLE IF EXISTS employees;
+
+-- 对于管理表 manage table 删除表会删除表的元数据以及表中的数据
+-- 对于外部表 external table 删除表只会删除表的元数据，不会删除表中的数据
+
+-- 对标进行重命名
+
+ALTER TABLE log_messages RENAME TO log;
+
+-- 修改、增加和删除表分区
+
+ALTER TABLE log DROP IF EXISTS PARTITION(year = 2018);
+
+-- 修改列的信息
+
+ALTER TABLE log
+CHANGE COLUMN hms hours_minutes_seconds INT
+FIRST;
+
+-- 增加列
+
+ALTER TABLE log ADD COLUMNS(
+    app_name STRING,
+    session_id BIGINT);
+
 
