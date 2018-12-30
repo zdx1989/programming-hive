@@ -44,3 +44,29 @@ SELECT name, salary,
         WHEN salary >= 10000 AND salary < 20000 THEN 'middle'
         WHEN salary >= 20000 THEN 'high'
     END AS bracket FROM employees;
+
+-- 如何避免进行MapReduce
+-- 大部分查询都会触发一个mapreduce的job，但是hive对于有些查询时不会触发mapreduce，也就是所谓的本地模式
+SET hive.exec.model.local.auto=true
+-- 设置该属性hive还是尝试使用本地模式执行其他的操作
+
+-- WHERE语句
+-- 不能在WHERE语句中使用别名, 不过可以使用嵌套查询来处理
+SELECT name, salary,
+    CASE
+        WHEN salary < 10000 THEN 'low'
+        WHEN salary >= 10000 AND salary < 20000 THEN 'middle'
+        WHEN salary >= 20000 THEN 'high'
+    END AS bracket FROM employees
+WHERE bracket = 'high';
+-- 上面的SQL语句不能通过，因为不能再WHERE语句使用别名，不过可以使用嵌套查询来替换
+SELECT e.* FROM
+    (SELECT name, salary,
+        CASE
+            WHEN salary < 10000 THEN 'low'
+            WHEN salary >= 10000 AND salary < 20000 THEN 'middle'
+            WHEN salary >= 20000 THEN 'high'
+        END AS bracket FROM employees) AS e
+WHERE bracket = 'high';
+
+
