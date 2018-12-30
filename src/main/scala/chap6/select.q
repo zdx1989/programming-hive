@@ -69,4 +69,9 @@ SELECT e.* FROM
         END AS bracket FROM employees) AS e
 WHERE bracket = 'high';
 
+-- 谓语操作符
+-- LIKE和RELIKE
+
+-- GROUP BY 语句
+-- GROUP 通常会和聚合函数一起使用，按照一个或者多个列进行分组，然后对每个组进行聚合操作
 
