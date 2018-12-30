@@ -23,12 +23,24 @@ SELECT symbol, `price.*` FROM stocks;
 -- 常用聚合函数
 -- count(*) 计算总行数，包含null的行；count(expr)计算expr表达式的值非null的行
 -- sum(col) 计算指定行的和；avg(col) 计算指定行的平均值
--- SET hive.map.aggr=true 设置该属性可以触发map阶段的预聚合，减少reduce时的数据量，提高性能，不过该设置会消耗更多的内存
--- SELECT count(*), avg(salary) FROM employees;
+SET hive.map.aggr=true 设置该属性可以触发map阶段的预聚合，减少reduce时的数据量，提高性能，不过该设置会消耗更多的内存
+SELECT count(*), avg(salary) FROM employees;
 
 -- 常用表生成函数
 -- 表生成函数和聚合函数相反，聚合函数将多行聚合成一行，表生成函数是将一行生成多行
 -- explode(Array arr)返回0到多行的结果，每一行对应数组的一个元素
--- SELECT EXPLODE(subordinates) AS sub FROM employees;
+SELECT EXPLODE(subordinates) AS sub FROM employees;
 
 -- 其他内置函数和时间处理有关的函数
+
+-- LIMIT语句
+-- 列别名
+-- 嵌套SELECT语句
+-- CASE WHEN THEN语句和if else语句很想，用于处理单个列的查询结果
+
+SELECT name, salary,
+    CASE
+        WHEN salary < 10000 THEN 'low'
+        WHEN salary >= 10000 AND salary < 20000 THEN 'middle'
+        WHEN salary >= 20000 THEN 'high'
+    END AS bracket FROM employees;
