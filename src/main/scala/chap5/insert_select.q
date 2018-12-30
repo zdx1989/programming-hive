@@ -33,3 +33,9 @@ SELECT * FROM employees;
 -- hive.exec.dynamic.partition.mode = nostrict
 -- hive动态分区设置不当的话可能会产生大量的分区和小文件，所以hive有配置对分区数和文件数进行限制
 
+-- 可以将hive表中的数据导出到本地的目录，可以使用Hadoop fs -copyToLocal sourcePath targetPath
+-- 可恶意使用INSERT OVERWRITE LOCAL DIRECTORY
+
+INSERT OVERWRITE LOCAL DIRECTORY '/Users/zhoudunxiong/employees'
+SELECT name, salary
+FROM employees;
