@@ -158,3 +158,10 @@ ALTER TABLE log ADD COLUMNS(
     session_id BIGINT);
 
 
+-- 可以将分区下面的文件压缩成一个Hadoop压缩包（HAR）文件，这样可以减少文件系统中的文件数，减轻NameNode的压力
+
+-- 新版本的hive不再支持该功能
+
+ALTER TABLE employees ARCHIVE PARTITION (country = 'CN', state = 'HN');
+
+
