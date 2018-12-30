@@ -19,3 +19,12 @@ INSERT OVERWRITE TABLE employees2 PARTITION (country = 'CN', state = 'HN')
     WHERE se.country = 'CN' AND se.state = 'HN';
 
 -- 这里可以混合使用OVERWRITE和INTO
+
+-- hive提供了动态分区的功能，可以基于查询参数推断出需要创建的分区名称
+SET hive.exec.dynamic.partition = true;
+SET hive.exec.dynamic.partition.mode = nostrict;
+
+INSERT OVERWRITE TABLE employees2
+PARTITION (country, state)
+SELECT * FROM employees;
+
