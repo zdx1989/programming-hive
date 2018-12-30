@@ -164,4 +164,3 @@ ALTER TABLE log ADD COLUMNS(
 
 ALTER TABLE employees ARCHIVE PARTITION (country = 'CN', state = 'HN');
 
-
