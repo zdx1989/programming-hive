@@ -28,3 +28,8 @@ INSERT OVERWRITE TABLE employees2
 PARTITION (country, state)
 SELECT * FROM employees;
 
+-- hive默认是没有开启动态分区功能的，需要设置hive.exec.dynamic.partition = true才能开启动态分区功能
+-- hive默认分区模式是严格的， 也就说只要有一个分区是静态的，假如想都是动态的，需要设置
+-- hive.exec.dynamic.partition.mode = nostrict
+-- hive动态分区设置不当的话可能会产生大量的分区和小文件，所以hive有配置对分区数和文件数进行限制
+
