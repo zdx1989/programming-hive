@@ -118,3 +118,43 @@ LIMIT 10;
 -- JOIN 的优化
 
 -- JOIN表的顺序，保证连接的表从左到右是依次增大的，也就是先连接最小的表，最后连接最大的表
+
+-- LEFT OUTER JOIN
+-- 一左表的记录为准，右表找不到匹配字段的时候返回NULL值
+
+DROP TABLE IF EXISTS dividends_import;
+CREATE EXTERNAL TABLE IF NOT EXISTS dividends_import (
+    `exchange` STRING,
+    symbol   STRING,
+    ymd      STRING,
+    dividend FLOAT
+)
+ROW FORMAT DELIMITED FIELDS TERMINATED BY ','
+LOCATION '/data/dividends_import';
+
+LOAD DATA LOCAL INPATH '/Users/zhoudunxiong/Code/programming-hive/data/dividends'
+OVERWRITE INTO TABLE dividends_import;
+
+DROP TABLE IF EXISTS dividends;
+CREATE EXTERNAL TABLE IF NOT EXISTS dividends (
+    ymd      STRING,
+    dividend FLOAT
+)
+PARTITIONED BY (`exchange` STRING, symbol STRING)
+ROW FORMAT DELIMITED FIELDS TERMINATED BY ','
+LOCATION '/data/dividends';
+
+INSERT OVERWRITE TABLE dividends
+PARTITION (`exchange`, symbol)
+SELECT e.ymd, e.dividend, e.`exchange`, e.symbol
+FROM dividends_import e;
+
+-- OUTER JOIN
+-- 将分区过滤的内容放在JOIN ON的字句中， 在LEFT OUTER JOIN 中是不可用的，但是在INNER JOIN中是可用的
+-- 可以使用嵌套查询来完成，先分区过滤，在JOIN连接的操作
+
+-- RIGHT OUTER JOIN 右连接
+-- FULL OUTER JOIN 全连接
+
+-- LEFT
+
