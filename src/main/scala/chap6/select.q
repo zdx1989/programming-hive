@@ -94,3 +94,27 @@ GROUP BY country, state
 WHERE avg(salary) >= 10000;
 
 -- WHERE字句中不能含有函数，也不能使用表的别名？
+
+-- hive支持通常的SQL JOIN 但是只支持等值连接？
+
+-- 内连接（INNNER JOIN）
+LOAD DATA LOCAL INPATH '/Users/zhoudunxiong/Code/programming-hive/data/stocks'
+OVERWRITE INTO TABLE stocks;
+
+SELECT a.ymd, a.price_close, b.price_close
+FROM stocks a JOIN stocks b ON a.ymd <= b.ymd
+WHERE a.symbol = 'AAPL' AND b.symbol = 'IBM'
+LIMIT 10;
+
+-- hive 中不支持等值连接，目前版本已经支持？
+
+-- 可以对多张表进行JOIN连接，理论上每对JOIN都会启动一个MapReduce Job，JOIN的顺序总是从左到右的
+
+SELECT a.ymd, a.price_close, b.price_close, c.price_close
+FROM stocks a JOIN stocks b ON a.ymd = b.ymd JOIN stocks c ON b.ymd = c.ymd
+WHERE a.symbol = 'AAPL' AND b.symbol = 'IBM' AND c.symbol = 'GE'
+LIMIT 10;
+
+-- JOIN 的优化
+
+-- JOIN表的顺序，保证连接的表从左到右是依次增大的，也就是先连接最小的表，最后连接最大的表
