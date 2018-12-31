@@ -77,3 +77,20 @@ WHERE bracket = 'high';
 SELECT avg(salary), country, state FROM employees
 GROUP BY country, state;
 
+-- HAVING 语句
+-- HAVING 可以替代SELECT FROM GROUP BY WHERE，例如：
+
+SELECT s2.avg, s2.country, s2.state FROM
+    (SELECT avg(salary) AS avg, country, state
+     FROM employees
+     GROUP BY country, state) s2
+WHERE avg >= 10000;
+
+-- 上面嵌套查询可以使用HAVING来替换
+
+SELECT avg(salary), country, state
+FROM employees
+GROUP BY country, state
+WHERE avg(salary) >= 10000;
+
+-- WHERE字句中不能含有函数，也不能使用表的别名？
