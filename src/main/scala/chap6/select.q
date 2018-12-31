@@ -74,4 +74,6 @@ WHERE bracket = 'high';
 
 -- GROUP BY 语句
 -- GROUP 通常会和聚合函数一起使用，按照一个或者多个列进行分组，然后对每个组进行聚合操作
+SELECT avg(salary), country, state FROM employees
+GROUP BY country, state;
 
