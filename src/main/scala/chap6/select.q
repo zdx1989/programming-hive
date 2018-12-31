@@ -106,6 +106,11 @@ FROM stocks a JOIN stocks b ON a.ymd <= b.ymd
 WHERE a.symbol = 'AAPL' AND b.symbol = 'IBM'
 LIMIT 10;
 
+-- 非自连接
+SELECT s.ymd, s.symbol, s.price_close, d.dividend
+FROM stocks s JOIN dividends_import d ON s.ymd = d.ymd AND s.symbol = d.symbol
+WHERE s.symbol = 'AAPL';
+
 -- hive 中不支持等值连接，目前版本已经支持？
 
 -- 可以对多张表进行JOIN连接，理论上每对JOIN都会启动一个MapReduce Job，JOIN的顺序总是从左到右的
@@ -118,6 +123,12 @@ LIMIT 10;
 -- JOIN 的优化
 
 -- JOIN表的顺序，保证连接的表从左到右是依次增大的，也就是先连接最小的表，最后连接最大的表
+
+-- 应该将小表dividends_import放在JOIN的前面
+
+SELECT s.ymd, s.symbol, s.price_close, d.dividend
+FROM  dividends_import d JOIN stocks s ON s.ymd = d.ymd AND s.symbol = d.symbol
+WHERE s.symbol = 'AAPL';
 
 -- LEFT OUTER JOIN
 -- 一左表的记录为准，右表找不到匹配字段的时候返回NULL值
@@ -149,6 +160,10 @@ PARTITION (`exchange`, symbol)
 SELECT e.ymd, e.dividend, e.`exchange`, e.symbol
 FROM dividends_import e;
 
+SELECT s.ymd, s.symbol, s.price_close, d.dividend
+FROM stocks s LEFT OUTER JOIN dividends_import d ON s.ymd = d.ymd AND s.symbol = d.symbol
+WHERE s.symbol = 'AAPL';
+
 -- OUTER JOIN
 -- 将分区过滤的内容放在JOIN ON的字句中， 在LEFT OUTER JOIN 中是不可用的，但是在INNER JOIN中是可用的
 -- 可以使用嵌套查询来完成，先分区过滤，在JOIN连接的操作
@@ -156,5 +171,17 @@ FROM dividends_import e;
 -- RIGHT OUTER JOIN 右连接
 -- FULL OUTER JOIN 全连接
 
--- LEFT
+-- LEFT SEMI-JOIN
+-- 左半开连接会返回左边表的记录，记录需要匹配ON右边的条件
+-- SQL方言中会使用IN EXISTS这种结构来处理
+
+SELECT s.ymd, s.symbol, s.price_close
+FROM stocks s
+WHERE s.ymd, s.symbol IN
+(SELECT d.ymd, d.symbol FROM dividends_import d);
+
+-- 使用 LEFT SEMI JOIN 来代替
+
+SELECT s.ymd, s.symbol, s.price_close
+FROM stocks s LEFT SEMI JOIN dividends_import d ON s.ymd = d.ymd AND s.symbol = d.symbol;
 
