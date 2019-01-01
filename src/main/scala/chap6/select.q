@@ -207,3 +207,23 @@ WHERE s.symbol = 'AAPL';
 
 -- 为什么使用的map join查询的时间反而增加了
 
+-- hive left outer join和full outer join不支持这个优化
+
+
+-- ORDER BY 和 SORT BY
+
+-- hive的提供ORDER BY 进行全局排序， 所有的数据都通过一个reducer进行排序，对于大数据集会消耗很长的时间
+-- hive同时提供了SORT BY，只会在每一个reducer中进行排序，也就是一个局部排序，这个可以保证每个reducer输出的数据有序的，可以提高之后
+-- 全局排序的效率
+
+SELECT s.ymd, s.symbol, s.price_close
+FROM stocks s
+ORDER BY s.ymd ASC, s.symbol DESC
+LIMIT 10;
+
+SELECT s.ymd, s.symbol, s.price_close
+FROM stocks s
+SORT BY s.ymd ASC, s.price_close DESC;
+
+set hive.mapred.mode = strict;
+set mapreduce.job.reduces = 4;
