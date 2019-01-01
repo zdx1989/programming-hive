@@ -238,3 +238,16 @@ SELECT s.ymd, s.symbol, s.price_close
 FROM stocks s
 DISTRIBUTE BY s.symbol
 SORT BY s.ymd ASC, s.symbol DESC;
+
+-- CLUSTER BY 在一些情况下可以替换DISTRIBUTE BY和SORT BY例如：
+SELECT s.ymd, s.symbol, s.price_close
+FROM stocks s
+DISTRIBUTE BY s.symbol
+SORT BY s.symbol;
+
+可以替换成：
+SELECT s.ymd, s.symbol, s.price_close
+FROM stocks s
+CLUSTER BY s.symbol;
+
+--使用CLUSTER BY会失去SORT BY语句的全局性，但是可以得到全局排序的输出
