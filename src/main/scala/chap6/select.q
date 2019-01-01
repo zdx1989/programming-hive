@@ -208,6 +208,7 @@ WHERE s.symbol = 'AAPL';
 -- 为什么使用的map join查询的时间反而增加了
 
 -- hive left outer join和full outer join不支持这个优化
+-- 功能类似月spark的broadcast广播小表的功能
 
 
 -- ORDER BY 和 SORT BY
@@ -227,3 +228,13 @@ SORT BY s.ymd ASC, s.price_close DESC;
 
 set hive.mapred.mode = strict;
 set mapreduce.job.reduces = 4;
+
+-- 含有SORT BY 的 DISTRIBUTE BY
+-- MapReduce会根据map输出的键计算相应的哈希值，然后将得到的哈希键值对均匀的分布到各个reducer中去
+-- DISTRIBUTE BY 控制map输出在reducer中是如何分布的，类似于spark中的partitioner，分区器
+-- 例如，可以使用DISTRIBUTE BY将具有相同股票交易码的记录分发到同一个reducer中去，然后使用SORT BY在每个reducer中进行排序
+
+SELECT s.ymd, s.symbol, s.price_close
+FROM stocks s
+DISTRIBUTE BY s.symbol
+SORT BY s.ymd ASC, s.symbol DESC;
