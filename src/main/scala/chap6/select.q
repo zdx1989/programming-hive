@@ -251,3 +251,19 @@ FROM stocks s
 CLUSTER BY s.symbol;
 
 --使用CLUSTER BY会失去SORT BY语句的全局性，但是可以得到全局排序的输出
+
+-- 类型转换 cast(value AS TYPE)
+
+-- 抽样查询，分桶抽样和数据块抽样
+
+-- UNION ALL
+-- UNION ALL可以将多张表进行合并。每个union子查询必须具有相同的列，每列对应的字段类型也必须是一样的。
+SELECT l.ymd, l.level, l.message
+FROM (
+    SELECT l1.ymd, l1.level, l1.message
+    FROM log l1
+    UNION ALL
+    SELECT l2.ymd, l2.level, l2.message
+    FROM log l2
+) l
+SORT BY l.ymd ASC;
