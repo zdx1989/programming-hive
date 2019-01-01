@@ -28,7 +28,14 @@ CREATE TABLE userinfo (
     passwors  STRING
 );
 
-CREATE VIEW as
+CREATE VIEW safe_user_info as
 SELECT firstname, lastname FROM userinfo;
 
---
+-- 动态分区中的视图和map类型
+
+-- 视图其他相关的事情
+-- hive会优先解析视图，所以生成查询计划时，视图中的查询会先执行
+-- DROP VIEW XXX 可以删除视图
+-- SHOW TABLES 可以显示所有的表和视图
+-- DESCRIBE EXTENDED XXX视图的时候tableType 显示的是VIRTUAL_VIEW
+-- 视图不能作为INSERT语句和LOAD命令的目标表
