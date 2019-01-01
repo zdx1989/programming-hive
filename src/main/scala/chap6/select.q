@@ -185,3 +185,25 @@ WHERE s.ymd, s.symbol IN
 SELECT s.ymd, s.symbol, s.price_close
 FROM stocks s LEFT SEMI JOIN dividends_import d ON s.ymd = d.ymd AND s.symbol = d.symbol;
 
+-- join 笛卡尔积 (只有join没有on条件)
+
+-- map side JOIN
+-- 对大表JOIN小表的情况，可以先将小表放入内存，hive可以在map端执行join，省略掉常规连接需要的reduce过程
+
+SELECT s.ymd, s.symbol, s.price_close, d.dividend
+FROM stocks s JOIN dividends_import d ON s.ymd = d.ymd AND s.symbol = d.symbol
+WHERE s.symbol = 'AAPL';
+
+SELECT /*+ MAPJOIN(d) */s.ymd, s.symbol, s.price_close, d.dividend
+FROM stocks s JOIN dividends_import d ON s.ymd = d.ymd AND s.symbol = d.symbol
+WHERE s.symbol = 'AAPL';
+
+set hive.auto.convert.join = true;
+set hive.mapjoin.smalltable.filesize = 25000000
+
+SELECT s.ymd, s.symbol, s.price_close, d.dividend
+FROM stocks s JOIN dividends_import d ON s.ymd = d.ymd AND s.symbol = d.symbol
+WHERE s.symbol = 'AAPL';
+
+-- 为什么使用的map join查询的时间反而增加了
+
