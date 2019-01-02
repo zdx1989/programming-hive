@@ -45,6 +45,19 @@ SELECT * FROM weblog WHERE day = 20110102 AND state = 'CA';
 
 -- 唯一键和标准化
 
---
+-- 同一份多种处理
+-- hive可以从一个数据源产生多次聚合，不必每次都扫描
+
+INSERT OVERWRITE TABLE sales
+SELECT * FROM history WHERE action = 'purchased';
+
+INSERT OVERWRITE TABLE credits
+SELECT * FROM history WHERE action = 'returned';
+
+-- 上面的操作可以合成
+
+FROM history
+INSERT OVERWRITE table sales WHERE action = 'purchased'
+INSERT OVERWRITE table credits WHERE action = 'returned';
 
 
