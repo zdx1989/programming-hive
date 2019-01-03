@@ -107,6 +107,29 @@ CLUSTER BY (user_id);
 
 -- 分桶表有利于高校的map-join
 
---
+--为表增加列
+
+-- SerDe通常都是从左到右进行解析，SerDe通常是非常宽松的，加入某行的字段比预期的字段少，缺少的字段会返回null
+-- 加入某行的字段比预期的字段多，多出的字段会被忽略掉
+-- 方便的为已有的表增加字段
+
+DROP TABLE IF EXISTS weblogs;
+CREATE TABLE IF NOT EXISTS weblogs(version BIGINT, url STRING)
+PARTITIONED BY (hit_date INT)
+ROW FORMAT DELIMITED FIELDS TERMINATED BY ',';
+
+LOAD DATA LOCAL INPATH '/Users/zhoudunxiong/Code/programming-hive/src/main/scala/chap9/log1.txt'
+OVERWRITE INTO TABLE weblogs
+PARTITION (hit_date = 20110101);
+
+LOAD DATA LOCAL INPATH '/Users/zhoudunxiong/Code/programming-hive/src/main/scala/chap9/log2.txt'
+OVERWRITE INTO TABLE weblogs
+PARTITION (hit_date = 20110102);
+
+ALTER TABLE weblogs ADD COLUMNS (user_id STRING);
+
+SELECT * FROM weblogs;
+
+-- 这种方式不能在表的中间或者开始添加字段
 
 
