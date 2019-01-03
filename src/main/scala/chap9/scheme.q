@@ -60,4 +60,53 @@ FROM history
 INSERT OVERWRITE table sales WHERE action = 'purchased'
 INSERT OVERWRITE table credits WHERE action = 'returned';
 
+--分桶表的数据存储
+--分区提供了隔离数据和优化查询的便利方式，但是不是所有的数据集都可以形成合理的分区
+--分桶是将数据集分解成更容易管理的若干部分的另一种技术
+
+-- hive会限制创建动态分区的最大数量, hive.exec.max.dynamic.partitions = 1000
+-- 用來限制創建過多的分區，导致超过文件系统的处理能力，如下命令是可能失败的
+
+CREATE TABLE IF NOT EXISTS weblog (
+    url STRING,
+    source_ip STRING,
+)
+PARTITIONED BY (dt STRING, user_id INT);
+
+INSERT OVERWRITE TABLE weblog
+PARTITION (dt = '2012-06-08', user_id)
+SELECT url, source_id, user_id
+FROM raw_weblog;
+
+-- 由于会有很多不同的user_id所以上面的sql语句会动态的创建很多的分区，导致失败
+-- 一种更好的方案是对表weblog进行分桶，并使用user_id作为分桶字段，字段会根据用户指定的值进行哈希分发到桶中去
+-- 同一个user_id会分发到同一个桶中去，但是同一个桶内可能装着好几种user_id
+-- 例如user_id为1、3、4、8，加入分桶数为3，着0桶: [3], 1桶: [1, 4], 2桶: [8]
+-- weblog表也可以做相同的处理
+
+CREATE TABLE IF NOT EXISTS weblog (user_id INT, url STRING, source_ip STRING)
+PARTITIONED BY (dt STRING)
+CLUSTER BY (user_id) INTO 96 BUCKETS;
+
+-- 表声明只是定义了元数据，如何表数据插入表中完全取决于用户自己
+
+set hive.enforce.bucketing = true;
+
+INSERT OVERWRITE TABLE IF NOT EXISTS
+PARTITION (dt = '2018-01-29')
+SELECT user_id, url, source_ip
+FROM raw_weblog;
+
+set mapred.reducer.tasks = 96;
+
+INSERT OVERWRITE TABLE IF NOT EXISTS
+PARTITION (dt = '2018-01-29')
+SELECT user_id, url, source_ip
+FROM raw_weblog
+CLUSTER BY (user_id);
+
+-- 分桶表有利于高校的map-join
+
+--
+
 
