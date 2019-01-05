@@ -23,5 +23,22 @@ EXPLAIN SELECT sum(number) FROM onecol;
 set hive.limit.optimize.enable = true
 set hive.limit.row.max.size = 100000
 set hive.limit.optimize.limit.file = 10
-因为limit使用的是抽样，所以抽样的数据可能不包含用户想要的数据
+-- 因为limit使用的是抽样，所以抽样的数据可能不包含用户想要的数据
+
+-- join 优化
+-- join 的时候将表按照从小到大的顺序从左到右join，将最大的表放在最右边
+-- 加入一张表足够小，小到完全可以载入到内存时，可以使用map-side join
+-- 如何开启map-side join
+
+set hive.auto.convert.join = true
+set hive.mapjoin.smalltable.filesize = 2500000
+
+-- 本地模式
+
+-- hive输入的数据量非常小的时候, 这个时候触发执行任务消耗的时间可能比任务执行的时间还长
+-- 对于这种情况可是使用本地模式，在单个机器单个进程中处理所有的任务，对于小数据集，可以明显缩短执行时间
+
+set hive.exec.mode.local.auto = true;
+
+--
 
