@@ -40,5 +40,12 @@ set hive.mapjoin.smalltable.filesize = 2500000
 
 set hive.exec.mode.local.auto = true;
 
---
+-- 并行执行
+-- hive会将查询转化为各个阶段（stage），各个阶段可能是相互依赖的，也有可能不是相互依赖的，
+-- 二这些不存在相互依赖的阶段是可以并行执行的。通过设置下面的参数，可以开启并行执行。
+
+set hive.exec.parallel = true
+
+-- 设置并行执行后，集群的利用率会增加
+
 
