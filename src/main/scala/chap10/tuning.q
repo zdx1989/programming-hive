@@ -65,5 +65,25 @@ set hive.mapred.mode = strict
 -- hive和关系数据库不一样的地方，对于JOIN WHERE关系数据会自动优化成JOIN ON，而在hive中不存在这种优化
 -- 这时候会产生一个笛卡尔查询， 假如表很大，那么结果是完全不可控的
 
+-- 调整mapper和reducer的个数
+-- hive查询会转化成MapReduce任务，每个任务可能具有多个mapper和reducer任务，确定最佳的mapper和reducer个数取决于多个变量
+-- 例如输入的数据量大小和对这些数据量执行的操作类型
+
+-- hive是按照输入量大小来确定reducer的个数的，例如
+-- 某张表根据分区来查询，具体分区下的数据量是2.7个G，已有hive的配置
+set hive.exec.reducers.bytes.per.reducer = 10000000000;
+-- 该属性的默认值的是1GB, 那么产生3个reducer，假如修改该属性
+set hive.exec.reducers.bytes.per.reducer = 7500000000;
+-- 那么将产生4个reducer，这样根据输入表计算出来的reducer个数一般是比较合适的，不过有些情况下map阶段会产生更多的数据量
+-- 这个时候按照输入的数据量计算的reducer个数就会少了；而有的时候map阶段会过滤掉很多的数据，这个时候根据输入量计算的reducer
+-- 个数就会多了。这个时候可以用户自己配置固定的reducer的个数
+set mapred.reducer.tasks = 3;
+
+-- 在共享的集群（多个团队共享一个Hadoop集群）上处理大任务的时候，为了控制资源的使用，属性
+set hive.exec.reducers.max;
+-- 显得非常重要，一个Hadoop集群可以提供的mapper和reducer资源个数（也称为插槽）是固定的。一个大的任务可能消耗掉所有的插槽，
+-- 从而导致其他的job无法执行，该属性可以阻止某个属性消耗太多的reducer资源。该属性值大小的计算公式为
+-- 集群总reducer槽位数 * 1.5 / 执行中平均的查询个数
+
 
 
