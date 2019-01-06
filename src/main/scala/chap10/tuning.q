@@ -103,4 +103,14 @@ set hive.exec.dynamic.partition.mode = strict;
 set hive.exec.max.dynamic.partitions = 10000
 -- 可以限制动态分区的可以创建的最大分区的个数
 
+-- 推测执行
+-- 推测执行是Hadoop的一个功能，所谓推测执行指的是对于一些执行时间特别慢的任务，Hadoop可以侦查到这些任务，然后
+-- 重启一个新的一样的任务，来提高整体的运行效率
+
+-- hive本身也提供了reduce-side的推测执行
+set hive.mapred.reduce.tasks.speculative.axecution = true;
+
+-- 虚拟列
+
+
 
