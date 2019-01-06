@@ -85,5 +85,13 @@ set hive.exec.reducers.max;
 -- 从而导致其他的job无法执行，该属性可以阻止某个属性消耗太多的reducer资源。该属性值大小的计算公式为
 -- 集群总reducer槽位数 * 1.5 / 执行中平均的查询个数
 
+-- JVM重用
+-- Hadoop配置都是使用派生JVM实例来执行map和reducer的任务的，对于task非常多的场景，JVM的启动过程会造成相当大的开销，
+-- JVM重用可以使得JVM实例在同一个job中使用多次
+set mapred.job.reuse.jvm.num.tasks = 10
+
+-- 这个功能的缺点是jvm重用的实例会一直占用task插槽，可能影响其他的任务获取集群的资源
+
+-- 动态分区调整
 
 
