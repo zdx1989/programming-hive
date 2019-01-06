@@ -93,5 +93,14 @@ set mapred.job.reuse.jvm.num.tasks = 10
 -- 这个功能的缺点是jvm重用的实例会一直占用task插槽，可能影响其他的任务获取集群的资源
 
 -- 动态分区调整
+-- 用户可以通过如下设置开启动态分区的功能：
+set hive.exec.dynamic.partition = true;
+-- 使用动态分区的时候存在一个隐患，就是用户select出来的分区字段右太多的数据可能导致生成太多的分区
+-- 太多的分区会造成过多的文件夹目录和小文件，这个对hdfs的namenode会造成过大的压力，文件目录的元数据都是
+-- 存在namenode的内存中，所以需要限制动态分区的使用
+set hive.exec.dynamic.partition.mode = strict;
+-- 设置动态分区为严格模式的话， 需要保证分区字段中至少有一个是静态分区字段
+set hive.exec.max.dynamic.partitions = 10000
+-- 可以限制动态分区的可以创建的最大分区的个数
 
 
