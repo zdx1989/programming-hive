@@ -22,3 +22,33 @@ set hive.exec.compress.output = true
 -- 对于输出压缩可以使用gzip（压缩空间最多）， 注意gzip是不可以分割的
 
 -- sequenceFile
+-- 压缩文件可以节省存储空间，但是在Hadoop中直接存储裸压缩文件有一个缺点就是，通常这些文件都是不可分割的
+-- Hadoop支持的sequenceFile可以将文件划分成多个块，然后采用一种可分割的方式对文件进行压缩
+
+-- 如何早hive中使用sequenceFile
+
+CREATE TABLE IF NOT EXISTS sequence_file STORED AS SEQUENCEFILE
+
+-- sequence file 提供了三种压缩方式，NONE, RECORD, BLOCK, 默认的压缩方式是RECORD
+-- 不过通常来说，BLOCK级别压缩性能最好，而且是可以分割的
+
+-- 在mapred-site.xml或者hive-site.xml文件中进行定义
+
+set mapred.output.compression.type = BLOCK
+
+--使用压缩实践
+
+drop table if exists table_a;
+create table if not exists table_a (a int, b int)
+row format delimited fields terminated by ',';
+
+load data local inpath '/Users/zhoudunxiong/Code/programming-hive/src/main/scala/chap11/data.txt'
+overwrite into table table_a;
+
+select * from table_a;
+
+
+drop table if exists intermediate_comp_on;
+create table if not exists intermediate_comp_on
+row format delimited fields terminated by ','
+as select * from table_a;
