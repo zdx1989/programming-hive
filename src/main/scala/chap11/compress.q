@@ -38,6 +38,8 @@ set mapred.output.compression.type = BLOCK
 
 --使用压缩实践
 
+--开启中间数据压缩
+
 drop table if exists table_a;
 create table if not exists table_a (a int, b int)
 row format delimited fields terminated by ',';
@@ -49,6 +51,33 @@ select * from table_a;
 
 
 drop table if exists intermediate_comp_on;
+
 create table if not exists intermediate_comp_on
 row format delimited fields terminated by ','
 as select * from table_a;
+
+--开启输出结果压缩
+set hive.exec.compress.output=true;
+
+create table if not exists final_com_on
+row format delimited fields terminated by ','
+as select * from table_a;
+
+dfs -ls /user/hive/warehouse/mydb.db/final_com_on;
+dfs -cat /user/hive/warehouse/mydb.db/final_com_on/000000_0.deflate;
+
+select * from final_com_on;
+
+-- 使用Gzip进行压缩
+set mapred.output.compression.codec=org.apache.hadoop.io.compress.GzipCodec;
+
+create table if not exists final_comp_on_gz
+row format delimited fields terminated by ','
+as select * from table_a;
+
+dfs -ls /user/hive/warehouse/mydb.db/final_comp_on_gz;
+
+select * from final_comp_on_gz;
+
+! /bin/zcat /user/hive/warehouse/mydb.db/final_comp_on_gz/000000_0.gz;
+
