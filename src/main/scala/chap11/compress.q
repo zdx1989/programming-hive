@@ -96,4 +96,21 @@ dfs -cat /user/hive/warehouse/final_comp_on_gz_seq/000000_0
 
 dfs -text /user/hive/warehouse/final_comp_on_gz_seq/000000_0
 
+--存档分区
+
+create table if not exists hive_text(line string)
+partitioned by (folder string);
+
+load data local inpath '${env:HIVE_HOME}/RELEASE_NOTES.txt'
+into table hive_text partition(folder='doc');
+
+load data local inpath '${env:HIVE_HOME}/NOTICE'
+into table hive_text partition(folder='doc');
+
+dfs -ls /user/hive/warehouse/mydb.db/hive_text/folder=doc;
+
+set hive.archive.enabled=true;
+
+alter table hive_text archive partition (folder = 'docs');
+
 
