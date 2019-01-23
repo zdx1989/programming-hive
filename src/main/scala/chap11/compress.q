@@ -81,3 +81,19 @@ select * from final_comp_on_gz;
 
 ! /bin/zcat /user/hive/warehouse/mydb.db/final_comp_on_gz/000000_0.gz;
 
+--使用sequenceFile
+
+set mapred.output.compression.type=BLOCK;
+
+create table if not exists final_comp_on_gz_seq
+row format delimited fields terminated by ','
+stored as sequencefile
+as select * from table_a;
+
+dfs -ls /user/hive/warehouse/final_comp_on_gz_seq;
+
+dfs -cat /user/hive/warehouse/final_comp_on_gz_seq/000000_0
+
+dfs -text /user/hive/warehouse/final_comp_on_gz_seq/000000_0
+
+
